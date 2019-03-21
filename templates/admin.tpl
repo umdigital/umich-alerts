@@ -1,7 +1,7 @@
 <?php
 $umAlertsOptions = array_replace_recursive(
     array(
-        'mode' => 'test'
+        'mode' => 'dev'
     ),
     get_option( 'umich_alerts_options' ) ?: array()
 );
@@ -16,7 +16,7 @@ $umAlertsOptions = array_replace_recursive(
             <tr valign="top">
                 <th scope="row">Alert Mode:</th>
                 <td>
-                    <input type="radio" id="umich_alerts_options--mode-1" name="umich_alerts_options[mode]" value="test"<?php echo ($umAlertsOptions['mode'] == 'test' ? ' checked="checked"' : null);?> />
+                    <input type="radio" id="umich_alerts_options--mode-1" name="umich_alerts_options[mode]" value="dev"<?php echo ($umAlertsOptions['mode'] == 'dev' ? ' checked="checked"' : null);?> />
                     <label for="umich_alerts_options--mode-1">Development</label>
 
                     <input type="radio" id="umich_alerts_options--mode-2" name="umich_alerts_options[mode]" value="prod"<?php echo ($umAlertsOptions['mode'] == 'prod' ? ' checked="checked"' : null);?> />

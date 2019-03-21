@@ -12,19 +12,9 @@ define( 'UMALERTS_PATH', dirname( __FILE__ ) . DIRECTORY_SEPARATOR );
 
 class UMichAlerts
 {
-    static private $_cacheTimeout = 60 * 999;
-    static private $_alertsFeeds = array(
-        'test' => array(
-            'ealert' => 'https://dpss.umich.edu/rss/alert/test/'
-        ),
-        'prod' => array(
-            'ealert' => 'https://dpss.umich.edu/rss/alert/'
-        )
-    );
     static private $_defaultOptions = array(
-        'mode' => 'test'
+        'mode' => 'dev'
     );
-    static private $_alerts = array();
 
     static public function init()
     {
@@ -73,23 +63,20 @@ class UMichAlerts
             }
 
 
-            if( UMichAlerts::getAlert( 'ealert' ) && ($umAlertsOptions['mode'] == 'prod' || current_user_can( 'administrator' )) ) {
+            if( ($umAlertsOptions['mode'] == 'prod' || current_user_can( 'administrator' )) ) {
                 add_action( 'wp_enqueue_scripts', function(){
-                    wp_enqueue_script( 'umich-alerts', plugins_url( 'assets/umich-alerts.js', __FILE__ ), array(), '1.0', true );
-                    wp_enqueue_style( 'umich-alerts', plugins_url( 'assets/umich-alerts.css', __FILE__ ) );
+                    wp_enqueue_script( 'umich-alerts', 'https://umich.edu/apis/umalerts/umalerts.js', array(), '1.0', true );
                 });
 
-                add_action( 'wp_head', function(){
-                    if( $alert = UMichAlerts::getAlert( 'ealert' ) ) {
-                        ob_start();
-                        include UMALERTS_PATH .'templates'. DIRECTORY_SEPARATOR .'ealert.tpl';
-                        $html = ob_get_clean();
+                if( ($umAlertsOptions['mode'] == 'dev') && current_user_can( 'administrator' ) ) {
+                    add_action( 'wp_head', function(){
+                        $umAlertsOptions = get_option( 'umich_alerts_options' ) ?: array();
 
                         echo "<script>\n";
-                        echo "var umEAlertHtml = ". json_encode( $html ) .";";
+                        echo "window.umalerts = { mode: '{$umAlertsOptions['mode']}' };\n";
                         echo "</script>\n";
-                    }
-                });
+                    });
+                }
             }
         });
 
@@ -122,65 +109,6 @@ class UMichAlerts
                 }
             );
         });
-    }
-
-    static public function getAlert( $type )
-    {
-        if( isset( self::$_alerts[ $type ] ) ) {
-            return self::$_alerts[ $type ];
-        }
-
-        $umAlertsOptions = get_option( 'umich_alerts_options' ) ?: array();
-
-        if( ($umAlertsOptions['mode'] == 'test') && !current_user_can( 'administrator' ) ) {
-            return false;
-        }
-
-        $wpUpload  = wp_upload_dir();
-        $cachePath = implode( DIRECTORY_SEPARATOR, array(
-            $wpUpload['basedir'],
-            'umich-alerts-cache',
-            $type .'--'. $umAlertsOptions['mode'] .'.cache'
-        ));
-
-        // PULL FROM SOURCE
-        if( !file_exists( $cachePath ) || ((@filemtime( $cachePath ) + self::$_cacheTimeout) < time()) ) {
-            // update timestamp so other request don't make a pull request at the same time
-            @touch( $cachePath );
-
-            // get live results
-            $stream = stream_context_create(array(
-                'http' => array(
-                    'timeout' => 1
-                )
-            ));
-            if( $xml = @file_get_contents( self::$_alertsFeeds[ $umAlertsOptions['mode'] ][ $type ], false, $stream ) ) {
-                if( $xml = @simplexml_load_string( $xml ) ) {
-                    // CACHE RESULTS
-                    wp_mkdir_p( dirname( $cachePath ) );
-
-                    @file_put_contents( $cachePath, $xml->asXML() );
-                }
-            }
-        }
-
-        if( $alerts = @simplexml_load_string( file_get_contents( $cachePath ) ) ) {
-            foreach( $alerts->channel->item as $item ) {
-                if( $item->alertlevel == 1 ) {
-                    $alert = array(
-                        'title' => (string) $item->title,
-                        'link'  => str_replace( 'www.', '', (string) $item->link ),
-                        'desc'  => (string) $item->description,
-                        'guid'  => (string) $item->guid
-                    );
-
-                    self::$_alerts[ $type ] = $alert;
-                    return $alert;
-                }
-            }
-        }
-
-        return false;
     }
 }
 UMichAlerts::init();
