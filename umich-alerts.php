@@ -3,7 +3,7 @@
  * Plugin Name: University of Michigan: Alerts
  * Plugin URI: https://github.com/umdigital/umich-alerts/
  * Description: Display Univeristy Alert banners
- * Version: 1.0
+ * Version: 1.1
  * Author: U-M: Digital
  * Author URI: http://vpcomm.umich.edu
  */
@@ -13,7 +13,8 @@ define( 'UMALERTS_PATH', dirname( __FILE__ ) . DIRECTORY_SEPARATOR );
 class UMichAlerts
 {
     static private $_defaultOptions = array(
-        'mode' => 'dev'
+        'mode'     => 'dev',
+        'location' => 'top'
     );
 
     static public function init()
@@ -68,15 +69,25 @@ class UMichAlerts
                     wp_enqueue_script( 'umich-alerts', 'https://umich.edu/apis/umalerts/umalerts.js', array(), '1.0', true );
                 });
 
-                if( ($umAlertsOptions['mode'] == 'dev') && current_user_can( 'administrator' ) ) {
-                    add_action( 'wp_head', function(){
-                        $umAlertsOptions = get_option( 'umich_alerts_options' ) ?: array();
+                add_action( 'wp_head', function(){
+                    $umAlertsOptions = get_option( 'umich_alerts_options' ) ?: array();
 
+                    $jsOptions = array();
+
+                    if( ($umAlertsOptions['mode'] != 'prod') && current_user_can( 'administrator' ) ) {
+                        $jsOptions['mode'] = $umAlertsOptions['mode'];
+                    }
+
+                    if( $umAlertsOptions['location'] != 'top' ) {
+                        $jsOptions['location'] = $umAlertsOptions['location'];
+                    }
+
+                    if( $jsOptions ) {
                         echo "<script>\n";
-                        echo "window.umalerts = { mode: '{$umAlertsOptions['mode']}' };\n";
+                        echo "window.umalerts = ". json_encode( $jsOptions ) ."\n";
                         echo "</script>\n";
-                    });
-                }
+                    }
+                });
             }
         });
 
