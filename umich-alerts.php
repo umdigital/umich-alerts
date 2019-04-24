@@ -21,7 +21,7 @@ class UMichAlerts
     {
         // UPDATER SETUP
         if( !class_exists( 'WP_GitHub_Updater' ) ) {
-            include_once UMALERTS_PATH .'vendor'. DIRECTORY_SEPARATOR .'updater.php';
+            include_once UMALERTS_PATH .'includes'. DIRECTORY_SEPARATOR .'updater.php';
         }
         if( isset( $_GET['force-check'] ) && $_GET['force-check'] && !defined( 'WP_GITHUB_FORCE_UPDATE' ) ) {
             define( 'WP_GITHUB_FORCE_UPDATE', true );
