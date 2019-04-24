@@ -1,3 +1,7 @@
+1.1.1 (2019-04-24)
+==================
+fix updater path
+
 1.1 (2019-03-22)
 ================
 Add option to place alert HTML at top or bottom of <body> element.

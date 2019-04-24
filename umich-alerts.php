@@ -3,7 +3,7 @@
  * Plugin Name: University of Michigan: Alerts
  * Plugin URI: https://github.com/umdigital/umich-alerts/
  * Description: Display Univeristy Alert banners
- * Version: 1.1
+ * Version: 1.1.1
  * Author: U-M: Digital
  * Author URI: http://vpcomm.umich.edu
  */
