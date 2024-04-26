@@ -1,3 +1,8 @@
+1.1.3 (2024-04-26)
+==================
+New updater library
+Change default mode from dev to prod
+
 1.1.2 (2019-04-24)
 ==================
 fix issue with older PHP version

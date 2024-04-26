@@ -1,7 +1,7 @@
 <?php
 $umAlertsOptions = array_replace_recursive(
     array(
-        'mode' => 'dev'
+        'mode' => 'prod'
     ),
     get_option( 'umich_alerts_options' ) ?: array()
 );
