@@ -3,7 +3,7 @@
  * Plugin Name: University of Michigan: Alerts
  * Plugin URI: https://github.com/umdigital/umich-alerts/
  * Description: Display Univeristy Alert banners
- * Version: 1.1.3
+ * Version: 1.1.4
  * Author: U-M: Digital
  * Author URI: http://vpcomm.umich.edu
  * Update URI: https://github.com/umdigital/umich-alerts/
@@ -25,10 +25,6 @@ class UMichAlerts
 
     static public function init()
     {
-        if( !class_exists( 'UMOneTrust' ) ) {
-            include_once UMALERTS_PATH .'includes'. DIRECTORY_SEPARATOR .'umonetrust.php';
-        }
-
         // load updater library
         if( file_exists( UMALERTS_PATH . implode( DIRECTORY_SEPARATOR, [ 'vendor', 'umdigital', 'wordpress-github-updater', 'github-updater.php' ] ) ) ) {
             include UMALERTS_PATH . implode( DIRECTORY_SEPARATOR, [ 'vendor', 'umdigital', 'wordpress-github-updater', 'github-updater.php' ] );
